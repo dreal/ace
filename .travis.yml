@@ -1,1 +1,26 @@
 language: node_js
+env:
+  global:
+   # GH_TOKEN=[secure]             (to push to osx/windows repo under soonhokong)
+   - secure: "a2cBQOFx5SU+HamLOda47oyZ3XrFWGKWHgxrFK/19iqlHPXgVBTNPZjA3fK4zT71q17/+bEX44wtEOu6/4bm/2nceUVDwypKhmCq9a1CApQJlCfXoqe/1nCI96VATQ4nnIGwZsjfkfWqWHSE+iebhwkDDZJzNZX6mGmOXX+Zxpc="
+   # REPO=BLESSED                  (to perform extra stuff only for pushes to the blessed repo)
+   - secure: "XfefDbF+gQjfc3gbB7DXDm7WDPajfuj//OD5QRfZ2nOzEJZX3spKtNoJ9D1dbilK0o9cIioBZD2zNDv+odJTd5ZD7aHRdcG0tXj/qr7p5+lynP4iYGPnL9XHQhYSczv0XGydKoA1NA60gaUS7bYlhluV5DBK8ReU9XO3RUKFbRA="
+
+script:
+  - node ./Makefile.dryice.js full
+  - if [[ $REPO == BLESSED ]]; then
+      git config --global user.email "notifications@travis-ci.org";
+      git config --global user.name "Travis CI";
+      git checkout --orphan gh-pages;
+      mv build/src-min-noconflict ace;
+      rm .git/index;
+      git add ace;
+      git clean -fxd;
+      git commit -m "Update `date -R`";
+      git push -q https://soonhokong:${GH_TOKEN}@github.com/dreal/ace.git +HEAD:gh-pages;
+    fi
+
+notifications:
+  email:
+    recipients:
+     - soonho.kong@gmail.com
